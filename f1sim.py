@@ -33,14 +33,52 @@ def simulate_quali():
     return results
     
 quali = simulate_quali()
-
+print("\n===== QUALIFYING =====\n")
 for pos, (driver, score) in enumerate(quali, start=1):
     print(f"{pos}. {driver} ({score:.2f})")
 
-for i in range(10):
-    quali = simulate_quali()
+# for i in range(10):
+#     quali = simulate_quali()
 
-    print(f"\nRun {i+1}")
+#     print(f"\nRun {i+1}")
 
-    for pos, (driver, score) in enumerate(quali[:5], start=1):
-        print(pos, driver)
+#     for pos, (driver, score) in enumerate(quali[:5], start=1):
+#         print(pos, driver)
+
+import random
+
+def simulate_race(quali_results):
+
+    race_results = []
+
+    for position, (driver, quali_score) in enumerate(quali_results):
+
+        stats = drivers[driver]
+
+        race_score = (
+            stats["Pace"] * 0.35 +
+            stats["Racecraft"] * 0.30 +
+            stats["Experience"] * 0.20 +
+            stats["Awareness"] * 0.15
+        )
+
+        starting_bonus = (20 - position) * 0.2
+
+        randomness = random.uniform(-5, 5)
+
+        final_score = race_score + starting_bonus + randomness
+
+        race_results.append((driver, final_score))
+
+    race_results.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    return race_results
+race = simulate_race(quali)
+
+print("\n===== RACE RESULTS =====\n")
+
+for pos, (driver, score) in enumerate(race, start=1):
+    print(f"{pos}. {driver}")
