@@ -21,6 +21,34 @@ drivers={"Max Verstappen":{"Pace":100, "Racecraft": 98, "Experience": 97, "Aware
 }
 calendar=["Australian Grand Prix", "Bahrain Grand Prix", "Chinese Grand Prix", "Azerbaijan Grand Prix", "Spanish Grand Prix", "Monaco Grand Prix", "Canadian Grand Prix", "French Grand Prix", "Austrian Grand Prix", "British Grand Prix", "Hungarian Grand Prix", "Belgian Grand Prix", "Italian Grand Prix", "Singapore Grand Prix", "Russian Grand Prix", "Japanese Grand Prix", "United States Grand Prix", "Mexico City Grand Prix", "Brazilian Grand Prix", "Abu Dhabi Grand Prix"]
 
+tracks = {
+
+    "Monaco Grand Prix": {
+        "pace": 0.8,
+        "racecraft": 1.0,
+        "awareness": 1.4
+    },
+
+    "Italian Grand Prix": {
+        "pace": 1.4,
+        "racecraft": 0.8,
+        "awareness": 1.0
+    },
+
+    "Japanese Grand Prix": {
+        "pace": 1.2,
+        "racecraft": 1.0,
+        "awareness": 1.2
+    },
+
+    "British Grand Prix": {
+        "pace": 1.2,
+        "racecraft": 1.1,
+        "awareness": 1.1
+    }
+    
+}
+
 def simulate_quali():
     results=[]
     for driver, stats in drivers.items():
@@ -45,10 +73,15 @@ for pos, (driver, score) in enumerate(quali, start=1):
 #     for pos, (driver, score) in enumerate(quali[:5], start=1):
 #         print(pos, driver)
 
-import random
-
-def simulate_race(quali_results):
-
+def simulate_race(quali_results, race_name):
+    track = tracks.get(
+    race_name,
+    {
+        "pace":1.0,
+        "racecraft":1.0,
+        "awareness":1.0
+    }
+)
     race_results = []
 
     for position, (driver, quali_score) in enumerate(quali_results):
@@ -56,11 +89,15 @@ def simulate_race(quali_results):
         stats = drivers[driver]
 
         race_score = (
-            stats["Pace"] * 0.35 +
-            stats["Racecraft"] * 0.30 +
-            stats["Experience"] * 0.20 +
-            stats["Awareness"] * 0.15
-        )
+
+        stats["Pace"] * track["pace"] * 0.35 +
+
+        stats["Racecraft"] * track["racecraft"] * 0.30 +
+
+        stats["Experience"] * 0.20 +
+
+        stats["Awareness"] * track["awareness"] * 0.15
+)
 
         starting_bonus = (20 - position) * 0.2
 
@@ -76,9 +113,76 @@ def simulate_race(quali_results):
     )
 
     return race_results
-race = simulate_race(quali)
+# race = simulate_race(
+#     quali,
+#     race_name
+# )
+def simulate_quali():
+    results = []
 
-print("\n===== RACE RESULTS =====\n")
+    for driver, stats in drivers.items():
 
-for pos, (driver, score) in enumerate(race, start=1):
-    print(f"{pos}. {driver}")
+        score = (
+            stats["Quali"] * 0.8
+            + stats["Pace"] * 0.7
+            + stats["Awareness"] * 0.2
+            + stats["Experience"] * 0.1
+            + stats["Racecraft"] * 0.3
+            + random.uniform(-10, 10)
+        )
+
+        results.append((driver, score))
+
+    results.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    return results
+
+
+points = [25,18,15,12,10,8,6,4,2,1]
+
+championship = {}
+
+for driver in drivers:
+    championship[driver] = 0
+
+
+def award_points(race_results):
+
+    for pos, (driver, score) in enumerate(race_results):
+
+        if pos < len(points):
+            championship[driver] += points[pos]
+
+
+for race_name in calendar:
+
+    print(f"\n===== {race_name} =====")
+
+    quali = simulate_quali()
+
+    race = simulate_race(quali, race_name)
+    award_points(race)
+
+    print("\nPodium:")
+
+    for pos, (driver, score) in enumerate(race[:3], start=1):
+        print(f"{pos}. {driver}")
+
+
+sorted_standings = sorted(
+    championship.items(),
+    key=lambda x: x[1],
+    reverse=True
+)
+
+print("\n==============================")
+print(" FINAL CHAMPIONSHIP STANDINGS ")
+print("==============================\n")
+
+for pos, (driver, points) in enumerate(sorted_standings, start=1):
+
+    print(f"{pos}. {driver} - {points} pts")
+
