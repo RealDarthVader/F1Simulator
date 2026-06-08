@@ -26,6 +26,14 @@ https://f1-simulator-red.vercel.app/
 - Vercel
 
 ## Run Locally
+Clone the repository:
+
+```bash
+git clone https://github.com/RealDarthVader/F1Simulator.git
+cd F1Simulator
+```
+
+Run the Python simulator:
 
 ```bash
 python f1sim.py
@@ -33,8 +41,4 @@ python f1sim.py
 
 Or open `index.html` in your browser.
 
-## Author
 
-Utkarsh
-
-GitHub: https://github.com/RealDarthVader
